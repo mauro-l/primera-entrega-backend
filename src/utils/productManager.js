@@ -1,55 +1,78 @@
-class ProductManager {
+import fs from "fs";
 
-    constructor (){
-        this.products = [];
-    }
+let products = [];
+const pathFile = "./src/data/products.json";
 
-    addProduct(product){
+const getProducts = async (limit) => {
+  const productsFs = await fs.promises.readFile(pathFile, "utf-8");
+  const productsParse = await JSON.parse(productsFs);
+  products = productsParse || [];
 
-        const { title, description, price, thumbnail, code, stock } = product;
+  if (!limit) return products;
 
-        const newProduct = {
-            id: this.products.length + 1,
-            title,
-            description,
-            price,
-            thumbnail,
-            code,
-            stock
-        }
+  return products.slice(0, limit);
+};
 
-        const productRepeat = this.products.find (prod => prod.code === code);
-        if(productRepeat) throw new Error("There is already a product with that code.")
-        if(Object.values(newProduct).includes(undefined)) throw new Error("All fields are required.")
-        
-        this.products.push(newProduct);
-    }
+const addProduct = async (product) => {
+  await getProducts();
+  const { title, description, price, thumbnail, code, stock, category } =
+    product;
+  const newProduct = {
+    id: products.length + 1,
+    title,
+    description,
+    price,
+    thumbnail: thumbnail || [],
+    code,
+    stock,
+    category,
+    status: true,
+  };
 
-    getProduct(){
-        console.log(this.products)
-    }
+  products.push(newProduct);
 
-    getProductById(id){
-        const product = this.products.find(prod => prod.id === id);
-        if(!product) throw new Error("Not found");
+  await fs.promises.writeFile(pathFile, JSON.stringify(products));
 
-        console.log(product);
-    }
-}
+  return product;
+};
 
-const product1 = new ProductManager()
+const getProductById = async (id) => {
+  products = await getProducts();
+  const product = products.find((prod) => prod.id === id);
 
-product1.addProduct({
-    title: "producto prueba",
-    description: "Este es un producto prueba",
-    price:200,
-    thumbnail: "Sin imagen",
-    code: "abc123",
-    stock:25
-});
+  return product;
+};
 
+const updateProducts = async (id, productData) => {
+  await getProducts();
 
-product1.getProduct();
+  const index = products.findIndex((prod) => prod.id === id);
+  products[index] = {
+    ...products[index],
+    ...productData,
+  };
 
-product1.getProductById(1);
-product1.getProductById(5);
+  await fs.promises.writeFile(pathFile, JSON.stringify(products));
+  const productFs = await getProductById(id);
+  return productFs;
+};
+
+const deleteProducts = async (id) => {
+  await getProducts();
+
+  const product = await getProductById(id);
+  if (!product) return false;
+
+  products = products.filter((prod) => prod.id !== id);
+
+  await fs.promises.writeFile(pathFile, JSON.stringify(products));
+  return true;
+};
+
+export default {
+  addProduct,
+  getProducts,
+  getProductById,
+  updateProducts,
+  deleteProducts,
+};

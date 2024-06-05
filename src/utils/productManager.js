@@ -22,7 +22,9 @@ const addProduct = async (product) => {
     title,
     description,
     price,
-    thumbnail: thumbnail || [],
+    thumbnail:
+      thumbnail ||
+      "https://img.freepik.com/vector-premium/estilo-ilustracion-vectorial-canasta_717774-48288.jpg",
     code,
     stock,
     category,

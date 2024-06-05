@@ -42,15 +42,22 @@ socket.on("products", (products) => {
   productList.innerHTML = "";
   products.forEach((product) => {
     const card = document.createElement("div");
-    card.classList.add("card");
-    card.style.width = "18rem";
+    /* card.classList.add("card"); */
+    /* card.style.width = "18rem"; */
     card.innerHTML = `
-        <div class="card-body">
-          <h5 class="card-title">${product.title}</h5>
-          <p class="card-text">ID: ${product.id}</p>
-          <p class="card-text">${product.description}</p>
-          <p class="card-text">$${product.price}</p>
+    <div class="card mb-3 d-flex flex-row" style="max-width: 540px;">
+        <div class="col-md-4">
+            <img src=${product.thumbnail} class="img-fluid rounded-start" alt="...">
         </div>
+        <div class="col-md-8">
+            <div class="card-body">
+            <h5 class="card-title">${product.title}</h5>
+            <p class="card-text">ID: ${product.id}</p>
+            <p class="card-text">${product.description}</p>
+            <p class="card-text">$${product.price}</p>
+            </div>
+        </div>
+    </div>
       `;
     productList.appendChild(card);
   });
